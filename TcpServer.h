@@ -1,16 +1,10 @@
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/select.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <fcntl.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
+
 #include <sys/epoll.h>
+
+#include "ChannelCallBack.h"
+#include "Channel.h"
 
 using namespace std;
 
@@ -21,14 +15,18 @@ using namespace std;
 #define MAX_EPOLL_FD      2
 #define MAX_EPOLL_EVENTS  100
 
-class TcpServer
+class TcpServer : public ChannelCallBack
 {
 public:
     TcpServer();
-	~TcpServer();
-	void start();
+    ~TcpServer();
+    void start();
+    virtual void handle(int sockfd);
 private:
     int tcp_listen();
-	void select_server();
-	void epoll_server();
+    void select_server();
+    void epoll_server();
+    int epollfd;
+    int listenfd;
 };
+#endif

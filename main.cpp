@@ -3,6 +3,6 @@
 int main(int args, char **argv)
 {
     TcpServer server;
-	server.start();
+    server.start();
     return 0;
 }
