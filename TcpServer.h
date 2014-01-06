@@ -1,10 +1,9 @@
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#ifndef TCPSERVER_H#define TCPSERVER_H
 
-#include <sys/epoll.h>
+#include <sys/epoll.h>#include <map>
 
-#include "ChannelCallBack.h"
-#include "Channel.h"
+#include "IFAcceptorCallBack.h"
+#include "Channel.h"#include "TcpConnection.h"
 
 using namespace std;
 
@@ -15,18 +14,15 @@ using namespace std;
 #define MAX_EPOLL_FD      2
 #define MAX_EPOLL_EVENTS  100
 
-class TcpServer : public ChannelCallBack
+class TcpServer : public IFAcceptorCallBack
 {
 public:
     TcpServer();
     ~TcpServer();
     void start();
-    virtual void handle(int sockfd);
+    //virtual void handle(int sockfd);       virtual void newTcpConnection(int sockfd);
 private:
-    int tcp_listen();
-    void select_server();
+    //int tcp_listen();
     void epoll_server();
     int epollfd;
-    int listenfd;
-};
-#endif
+    int listenfd;       map<int, TcpConnection *> mapSocketTcpConnection;};#endif

@@ -1,13 +1,13 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include "ChannelCallBack.h"
+#include "IFChannelCallBack.h"
 
 class Channel
 {
 public:
     Channel(int epollfd, int sockfd);
-    void setCallBack(ChannelCallBack *callBack);
+    void setCallBack(IFChannelCallBack *callBack);
     void registerEvent();
     void setREvent(int event);
     void handleEvent();
@@ -17,6 +17,6 @@ private:
     int sockfd;
     int events;
     int revents;
-    ChannelCallBack *callBack;
+    IFChannelCallBack *callBack;
 };
 #endif

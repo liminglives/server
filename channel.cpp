@@ -9,7 +9,7 @@ revents(0),
 callBack(0)
 {}
 
-void Channel::setCallBack(ChannelCallBack *callBack)
+void Channel::setCallBack(IFChannelCallBack *callBack)
 {
     this->callBack = callBack;
 }
