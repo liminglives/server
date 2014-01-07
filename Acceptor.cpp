@@ -1,5 +1,9 @@
 #include "Acceptor.h"
 
+#include "IFAcceptorCallBack.h"
+#include "Channel.h"
+#include "EventLoop.h"
+
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -10,18 +14,25 @@
 #include <iostream>
 #include <stdlib.h>
 
-Acceptor::Acceptor(int _epollfd)
-:epollfd(_epollfd),
+Acceptor:: Acceptor(EventLoop *loop)
+:pLoop(loop),
 listenfd(0),
 pChannel(0),
 pCallBack(0)
 {}
 
+Acceptor::~Acceptor()
+{
+    close(listenfd);
+    delete pChannel;
+}
+
 void Acceptor::start()
 {
     listenfd = tcp_listen();
     
-    pChannel = new Channel(epollfd, listenfd);
+    //pChannel = new Channel(epollfd, listenfd);
+    pChannel = new Channel(pLoop, listenfd);
     pChannel->setCallBack(this);
     pChannel->registerEvent();
 }
@@ -78,7 +89,7 @@ int Acceptor::tcp_listen()
         exit(1);
     }
     
-    if (-1 == listen(socket_ret, 5))
+    if (-1 == listen(socket_ret, MAX_LISTEN_CONN))
     {
         std::cout << "listen error!" << std::endl;
         exit(1);

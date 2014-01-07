@@ -1,12 +1,16 @@
 #include "Channel.h"
+
+#include "IFChannelCallBack.h"
+#include "EventLoop.h"
+
 #include <sys/epoll.h>
 
-Channel::Channel(int epollfd, int socketfd) 
-:epollfd(epollfd), 
-sockfd(socketfd), 
+Channel::Channel(EventLoop *loop, int socketfd)
+:sockfd(socketfd), 
 events(0), 
 revents(0), 
-callBack(0)
+callBack(0),
+pLoop(loop)
 {}
 
 void Channel::setCallBack(IFChannelCallBack *callBack)
@@ -16,12 +20,13 @@ void Channel::setCallBack(IFChannelCallBack *callBack)
 
 void Channel::registerEvent()
 {
-    struct epoll_event ev;
     events |= EPOLLIN;
-    ev.data.ptr = this;
-    ev.events = events;
-    epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &ev);    
-    
+    update();
+}
+
+void Channel::update()
+{
+   pLoop->update(this);
 }
 
 void Channel::setREvent(int event)
@@ -33,4 +38,14 @@ void Channel::handleEvent()
 {
     if (revents & EPOLLIN)
         callBack->handle(sockfd);
+}
+
+int Channel::getEvents()
+{
+    return events;
+}
+
+int Channel::getSockfd()
+{
+    return sockfd;
 }

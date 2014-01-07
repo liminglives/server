@@ -1,22 +1,25 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include "IFChannelCallBack.h"
+#include "Declear.h"
 
 class Channel
 {
 public:
-    Channel(int epollfd, int sockfd);
+    Channel(EventLoop *loop, int sockfd);
     void setCallBack(IFChannelCallBack *callBack);
     void registerEvent();
     void setREvent(int event);
     void handleEvent();
+    int getEvents();
+    int getSockfd();
     
-private:
-    int epollfd;
+private:;
     int sockfd;
     int events;
     int revents;
     IFChannelCallBack *callBack;
+    EventLoop *pLoop;
+    void update();
 };
 #endif

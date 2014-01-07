@@ -1,16 +1,25 @@
 #include "TcpConnection.h"
+
+#include "EventLoop.h"
+#include "Channel.h"
+
 #include <unistd.h>
 #include <iostream>
 #include <errno.h>
 #include <string.h>
 
-TcpConnection::TcpConnection(int _epollfd, int _sockfd)
+TcpConnection::TcpConnection(EventLoop *_pLoop, int _sockfd)
 :connfd(_sockfd),
-epollfd(_epollfd)
+pLoop(_pLoop)
 {
-    pChannel = new Channel(epollfd, connfd);
+    pChannel = new Channel(pLoop, connfd);
     pChannel->setCallBack(this);
     pChannel->registerEvent();
+}
+
+TcpConnection::~TcpConnection()
+{
+    delete pChannel;
 }
 
 void TcpConnection::handle(int sockfd)
