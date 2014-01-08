@@ -8,5 +8,6 @@ class Acceptor;
 class Epoll;
 class EventLoop;
 class TcpConnection;
+class IFUser;
 
 #endif

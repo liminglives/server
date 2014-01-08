@@ -5,7 +5,7 @@ class IFChannelCallBack
 {
 public:
     //ChannelCallBack() {}
-    virtual void handle(int sockfd) {};  
+    virtual void handle(int sockfd) = 0;  
     virtual ~IFChannelCallBack() {}
 };
 #endif

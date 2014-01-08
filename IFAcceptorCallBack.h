@@ -4,8 +4,8 @@
 class IFAcceptorCallBack
 {
 public:
-    virtual void newTcpConnection(int sockfd) {};
-    virtual ~IFAcceptorCallBack(){}
+    virtual void newTcpConnection(int sockfd) = 0;
+    virtual ~IFAcceptorCallBack(){};
 };
 
 #endif
