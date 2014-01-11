@@ -6,6 +6,8 @@
 
 #include <string>
 
+using namespace std;
+
 #define MAX_LINE_SIZE     128
 
 class TcpConnection : public IFChannelCallBack
@@ -17,12 +19,15 @@ public:
     void sendData(const std::string &data);
     void setUser(IFUser *_pUser);
     void enableConnection();
+    virtual void handleRead();
+    virtual void handleWrite();
 
 private:
     Channel *pChannel;
     int connfd;
     EventLoop *pLoop;
     IFUser *pUser;
-    
+    string *inBuf;
+    string *outBuf;
 };
 #endif

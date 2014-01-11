@@ -14,8 +14,11 @@ public:
     Acceptor(EventLoop *loop);
     ~Acceptor();
     virtual void handle(int sockfd);
+    virtual void handleRead();
+    virtual void handleWrite();
     void start();
     void setCallBack(IFAcceptorCallBack *_pCallBack);
+
 
 private:
     EventLoop *pLoop;

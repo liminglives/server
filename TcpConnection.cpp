@@ -12,11 +12,13 @@
 TcpConnection::TcpConnection(EventLoop *_pLoop, int _sockfd)
 :connfd(_sockfd),
 pLoop(_pLoop),
-pUser(0)
+pUser(0),
+inBuf(new string()),
+outBuf(new string())
 {
     pChannel = new Channel(pLoop, connfd);
     pChannel->setCallBack(this);
-    pChannel->registerEvent();
+    pChannel->enableReading();
 }
 
 TcpConnection::~TcpConnection()
@@ -53,11 +55,64 @@ void TcpConnection::handle(int sockfd)
     
 }
 
+void TcpConnection::handleRead()
+{
+    if (connfd < 0)
+    {
+        std::cout<<"EPOLLIN sockfd < 0"<<std::endl;
+        return;
+    }
+    char line[MAX_LINE_SIZE] = {0};
+    int nread = read(connfd, line, sizeof(line));
+    if (nread < 0)
+    {
+        std::cout<<"read error:" <<strerror(errno)<<std::endl;
+        close(connfd);
+        return;
+    }
+    else if (nread == 0)
+    {
+        std::cout << "read 0 closed fd" <<std::endl;
+        close(connfd);
+        return;
+    }
+    
+    inBuf->append(line, nread);
+    pUser->onMessage(this, *inBuf);
+}
+
+void TcpConnection::handleWrite()
+{
+    if (!outBuf->empty())
+    {
+        int nwrite = write(connfd, outBuf->c_str(), outBuf->size());
+        if (nwrite < 0)
+            std::cout<<"write error:"<<strerror(errno)<<std::endl;
+        else
+        {
+            *outBuf = (outBuf->substr(nwrite, outBuf->size()));
+            if (outBuf->empty())
+                pChannel->disableWriting();
+        }
+    }
+}
+
 void TcpConnection::sendData(const std::string & data)
 {
-    unsigned int nwrite = write(connfd, data.c_str(), data.size());
-    if (nwrite != data.size())
-        std::cout<<"write error:"<<strerror(errno)<<std::endl;
+    int nwrite = 0;
+    if (outBuf->empty())
+    {
+        nwrite = write(connfd, data.c_str(), data.size());
+        if (nwrite < 0)
+            cout << "write error" << endl;
+    }
+    if (nwrite < (static_cast<int>(data.size())))
+    {
+        outBuf->append(data.begin()+nwrite, data.end());
+        if (!(pChannel->isWriting()))
+            pChannel->enableWriting();
+    }
+
 }
 
 void TcpConnection::setUser(IFUser * _pUser)

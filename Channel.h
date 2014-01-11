@@ -8,11 +8,17 @@ class Channel
 public:
     Channel(EventLoop *loop, int sockfd);
     void setCallBack(IFChannelCallBack *callBack);
-    void registerEvent();
     void setREvent(int event);
     void handleEvent();
     int getEvents();
     int getSockfd();
+    void enableWriting();
+    void enableReading();
+    void disableWriting();
+    void disableReading();
+    int isWriting();
+    int getIndex();
+    void setIndex(int);
     
 private:;
     int sockfd;
@@ -20,6 +26,7 @@ private:;
     int revents;
     IFChannelCallBack *callBack;
     EventLoop *pLoop;
+    int index;
     void update();
 };
 #endif

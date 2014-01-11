@@ -34,7 +34,7 @@ void Acceptor::start()
     //pChannel = new Channel(epollfd, listenfd);
     pChannel = new Channel(pLoop, listenfd);
     pChannel->setCallBack(this);
-    pChannel->registerEvent();
+    pChannel->enableReading();
 }
 
 void Acceptor::setCallBack(IFAcceptorCallBack *_pCallBack)
@@ -62,6 +62,30 @@ void Acceptor::handle(int sockfd)
     << " accept socket fd:" << connfd 
     << std::endl;
 }
+
+void Acceptor::handleRead()
+{
+    struct sockaddr_in cli_addr;
+    socklen_t cli_len = sizeof(struct sockaddr_in);
+    int connfd = accept(listenfd, (struct sockaddr*)&cli_addr, &cli_len);
+    if (connfd < 0)
+    {
+        std::cout<<"accept error:"<<strerror(errno)<<std::endl;
+        return;
+    }
+    fcntl(connfd, F_SETFL, O_NONBLOCK);
+    
+    pCallBack->newTcpConnection(connfd);
+
+    std::cout << "new connection from " 
+    << "[" << inet_ntoa(cli_addr.sin_addr) 
+    << ":" << ntohs(cli_addr.sin_port) << "]" 
+    << " accept socket fd:" << connfd 
+    << std::endl;
+}
+
+void Acceptor::handleWrite()
+{}
 
 int Acceptor::tcp_listen()
 {

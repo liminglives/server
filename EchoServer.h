@@ -12,7 +12,7 @@ public:
     EchoServer(EventLoop *pLoop);
     ~EchoServer();
     virtual void onConnection(TcpConnection * pTcpConn);
-    virtual void onMessage(TcpConnection * pTcpConn, const  std::string & mes);
+    virtual void onMessage(TcpConnection * pTcpConn, std::string & mes);
     void start();
 
 private:

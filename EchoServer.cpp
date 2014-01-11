@@ -19,10 +19,14 @@ void EchoServer::onConnection(TcpConnection * pTcpConn)
     std::cout << "new connection" << std::endl;
 }
 
-void EchoServer::onMessage(TcpConnection * pTcpConn, const std::string & mes)
+void EchoServer::onMessage(TcpConnection * pTcpConn, std::string & mes)
 {
     if (pTcpConn)
-        pTcpConn->sendData(mes);
+    {
+        string data(mes);
+        mes.clear();
+        pTcpConn->sendData(data);
+    }
 }
 
 void EchoServer::start()

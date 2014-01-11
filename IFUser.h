@@ -8,6 +8,6 @@ class IFUser
 {
 public:
     virtual void onConnection(TcpConnection *pTcpConn) = 0;
-    virtual void onMessage(TcpConnection *pTcpConn, const std::string &mes) = 0;
+    virtual void onMessage(TcpConnection *pTcpConn, std::string &mes) = 0;
 };
 #endif

@@ -7,6 +7,10 @@
 #include <string.h>
 #include <errno.h>
 
+
+const int NewChannel = -1;
+const int OldChannel = 1;
+
 Epoll::Epoll()
 {
     epollfd = epoll_create(MAX_EPOLL_FD);
@@ -25,9 +29,19 @@ void Epoll::update(Channel *_pChannel)
 {
     struct epoll_event ev;
     //events |= EPOLLIN;
+    int mode = 0;
+    int index = _pChannel->getIndex();
+    if (index== NewChannel)
+    {
+        mode |= EPOLL_CTL_ADD;
+        _pChannel->setIndex(OldChannel);
+    }
+    else if (index == OldChannel)
+        mode |= EPOLL_CTL_MOD;
+         
     ev.data.ptr = _pChannel;
     ev.events = _pChannel->getEvents();
-    epoll_ctl(epollfd, EPOLL_CTL_ADD, _pChannel->getSockfd(), &ev); 
+    epoll_ctl(epollfd, mode, _pChannel->getSockfd(), &ev); 
 }
 
 void Epoll::poll(std::vector < Channel * > &vecChannel)

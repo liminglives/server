@@ -10,7 +10,8 @@ Channel::Channel(EventLoop *loop, int socketfd)
 events(0), 
 revents(0), 
 callBack(0),
-pLoop(loop)
+pLoop(loop),
+index(-1)
 {}
 
 void Channel::setCallBack(IFChannelCallBack *callBack)
@@ -18,15 +19,19 @@ void Channel::setCallBack(IFChannelCallBack *callBack)
     this->callBack = callBack;
 }
 
-void Channel::registerEvent()
-{
-    events |= EPOLLIN;
-    update();
-}
-
 void Channel::update()
 {
    pLoop->update(this);
+}
+
+int Channel::getIndex()
+{
+    return index;
+}
+
+void Channel::setIndex(int _index)
+{
+    index = _index;
 }
 
 void Channel::setREvent(int event)
@@ -37,7 +42,38 @@ void Channel::setREvent(int event)
 void Channel::handleEvent()
 {
     if (revents & EPOLLIN)
-        callBack->handle(sockfd);
+        callBack->handleRead();
+    if (revents & EPOLLOUT)
+        callBack->handleWrite();
+}
+
+void Channel::enableReading()
+{
+    events |= EPOLLIN;
+    update();
+}
+
+void Channel::enableWriting()
+{
+    events |= EPOLLOUT;
+    update();
+}
+
+void Channel::disableReading()
+{
+    events &= ~EPOLLIN;
+    update();
+}
+
+void Channel::disableWriting()
+{
+    events &= ~EPOLLOUT;
+    update();
+}
+
+int Channel::isWriting()
+{
+    return events & EPOLLOUT;
 }
 
 int Channel::getEvents()
