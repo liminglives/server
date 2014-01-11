@@ -4,7 +4,6 @@
 #include "Declear.h"
 #include "IFUser.h"
 #include "TcpServer.h"
-#include <string>
 
 class EchoServer : public IFUser
 {
@@ -12,7 +11,8 @@ public:
     EchoServer(EventLoop *pLoop);
     ~EchoServer();
     virtual void onConnection(TcpConnection * pTcpConn);
-    virtual void onMessage(TcpConnection * pTcpConn, std::string & mes);
+    virtual void onMessage(TcpConnection * pTcpConn, Buffer &data);
+    virtual void onCompleteWrite();
     void start();
 
 private:

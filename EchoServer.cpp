@@ -1,6 +1,6 @@
 #include "EchoServer.h"
 #include "TcpConnection.h"
-
+#include "Buffer.h"
 
 #include <iostream>
 
@@ -19,14 +19,19 @@ void EchoServer::onConnection(TcpConnection * pTcpConn)
     std::cout << "new connection" << std::endl;
 }
 
-void EchoServer::onMessage(TcpConnection * pTcpConn, std::string & mes)
+void EchoServer::onMessage(TcpConnection * pTcpConn, Buffer &data)
 {
     if (pTcpConn)
     {
-        string data(mes);
-        mes.clear();
-        pTcpConn->sendData(data);
+        std::string sdata(data.retriveAsAllString());
+        pTcpConn->sendData(sdata);
+    
     }
+}
+
+void EchoServer::onCompleteWrite()
+{
+    std::cout << "write completed" << std::endl;
 }
 
 void EchoServer::start()

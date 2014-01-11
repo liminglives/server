@@ -2,12 +2,12 @@
 #define IFUSER_H
 
 #include "Declear.h"
-#include <string>
 
 class IFUser
 {
 public:
     virtual void onConnection(TcpConnection *pTcpConn) = 0;
-    virtual void onMessage(TcpConnection *pTcpConn, std::string &mes) = 0;
+    virtual void onMessage(TcpConnection *pTcpConn, Buffer &data) = 0;
+    virtual void onCompleteWrite() = 0;
 };
 #endif

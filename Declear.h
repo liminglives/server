@@ -9,5 +9,7 @@ class Epoll;
 class EventLoop;
 class TcpConnection;
 class IFUser;
+class IFRun;
+class Buffer;
 
 #endif
