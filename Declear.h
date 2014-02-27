@@ -11,5 +11,6 @@ class TcpConnection;
 class IFUser;
 class IFRun;
 class Buffer;
+class TimerQueue;
 
 #endif

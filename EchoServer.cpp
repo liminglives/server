@@ -6,7 +6,9 @@
 
 EchoServer::EchoServer(EventLoop *_pLoop)
 :pLoop(_pLoop),
-pServer(_pLoop)
+pServer(_pLoop),
+timer(0),
+times(0)
 {
     pServer.setCallBack(this);
 }
@@ -27,6 +29,7 @@ void EchoServer::onMessage(TcpConnection * pTcpConn, Buffer &data)
         pTcpConn->sendData(sdata);
     
     }
+    timer = pLoop->runEvery(1, this);
 }
 
 void EchoServer::onCompleteWrite()
@@ -37,4 +40,14 @@ void EchoServer::onCompleteWrite()
 void EchoServer::start()
 {
     pServer.start();
+}
+
+void EchoServer::run(void * param)
+{
+    std::cout << times <<std::endl;
+    if (times++ == 3)
+    {
+        pLoop->cancelTimer(timer);
+        times = 0;
+    }
 }

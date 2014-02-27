@@ -5,7 +5,7 @@
 #include "IFUser.h"
 #include "TcpServer.h"
 
-class EchoServer : public IFUser
+class EchoServer : public IFUser , public IFRun
 {
 public:
     EchoServer(EventLoop *pLoop);
@@ -14,10 +14,13 @@ public:
     virtual void onMessage(TcpConnection * pTcpConn, Buffer &data);
     virtual void onCompleteWrite();
     void start();
+    virtual void run(void * param);
 
 private:
     EventLoop *pLoop;
     TcpServer pServer;
+    int timer;
+    int times;
     
 };
 #endif

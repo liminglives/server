@@ -65,7 +65,7 @@ void TcpConnection::handleWrite()
             if (outBuf.empty())
             {
                 pChannel->disableWriting();
-                pLoop->queueLoop(this);
+                pLoop->queueLoop(this, NULL);
             }
         }
     }
@@ -92,7 +92,7 @@ void TcpConnection::sendData(const std::string & data)
     }
     else //if (nwrite == (static_cast<int>(data.size())))
     {
-        pLoop->queueLoop(this);
+        pLoop->queueLoop(this, NULL);
     }
 
 }
@@ -108,7 +108,7 @@ void TcpConnection::enableConnection()
         pUser->onConnection(this);
 }
 
-void TcpConnection::run()
+void TcpConnection::run(void *param)
 {
     pUser->onCompleteWrite();
 }
