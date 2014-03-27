@@ -3,6 +3,9 @@
 
 #include "Declear.h"
 #include "Timestamp.h"
+#include "IFChannelCallBack.h"
+#include "IFRun.h"
+
 #include <vector>
 #include <set>
 
@@ -44,7 +47,7 @@ public:
         TimerQueue *pTimerQueue;
     };
 
-    class CancelTimerWrapper
+    class CancelTimerWrapper : public IFRun
     {
     public:
         CancelTimerWrapper(TimerQueue *_pTimerQueue):pTimerQueue(_pTimerQueue)
@@ -60,8 +63,8 @@ public:
     TimerQueue(EventLoop *_pEventLoop);
 
     
-    int addTimer(IFRun *pRun, Timestamp time, double interval);
-    void cancelTimer(int timerId);
+    long addTimer(IFRun *pRun, Timestamp time, double interval);
+    void cancelTimer(long timerId);
 
     virtual void handleRead();
     virtual void handleWrite();

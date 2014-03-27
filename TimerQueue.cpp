@@ -1,7 +1,13 @@
 #include "TimerQueue.h"
+#include "Channel.h"
+#include "EventLoop.h"
+#include "Timestamp.h"
+
+#include <unistd.h>
 #include <sys/timerfd.h>
 #include <iostream>
 #include <string.h>
+#include <inttypes.h>
 
 #define UINTPTR_MAX 0xffffffff
 
@@ -27,16 +33,16 @@ int TimerQueue::createTimerfd()
     return timerfd;
 }
 
-int TimerQueue::addTimer(IFRun *pRun, Timestamp time, double interval)
+long TimerQueue::addTimer(IFRun *pRun, Timestamp time, double interval)
 {
     Timer *pTimer = new Timer(time, pRun, interval);
     pEventLoop->queueLoop(pAddTimerWrapper, pTimer);
-    return (int)pTimer;
+    return reinterpret_cast<long>(pTimer);
 }
 
-void TimerQueue::cancelTimer(int timerId)
+void TimerQueue::cancelTimer(long timerId)
 {
-    pEventLoop->queueLoop(pCancelTimerWrapper, static_cast<void *>timerId);
+    pEventLoop->queueLoop(pCancelTimerWrapper, reinterpret_cast<void *>(timerId));
 }
 
 void TimerQueue::doAddTimer(void *param)
@@ -71,7 +77,7 @@ void TimerQueue::handleRead()
     readTimerfd(timerfd, now);
 
     std::vector<Entry> expired = getExpired(now);
-    for (std::vector<Entry> it = expired.begin(); it != expired.end(); ++it)
+    for (std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); ++it)
     {
         it->second->run();
     }
@@ -116,7 +122,7 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 void TimerQueue::readTimerfd(int timerfd, Timestamp now)
 {
     uint64_t howmany;
-    sszie_t n = read(timerfd, &howmany, sizeof(howmany));
+    ssize_t n = read(timerfd, &howmany, sizeof(howmany));
     if (n != sizeof(howmany))
     {
         std::cout << "TimerQueue:readTimerfd read error" << std::endl;
@@ -126,17 +132,17 @@ void TimerQueue::readTimerfd(int timerfd, Timestamp now)
 bool TimerQueue::insert(Timer* pTimer)
 {
     bool earliestChanged = false;
-    Timestamp when = pTimer->getStamp();
-    TimerList::iterator it = _timers.begin();
-    if(it == _timers.end() || when < it->first)
+    Timestamp when = pTimer->getTimestamp();
+    TimerList::iterator it = timerlist.begin();
+    if(it == timerlist.end() || when < it->first)
     {
         earliestChanged = true;
     }
     pair<TimerList::iterator, bool> result
-       = _timers.insert(Entry(when, pTimer));
+       = timerlist.insert(Entry(when, pTimer));
     if(!(result.second))
     {
-        cout << "_timers.insert() error " << endl;
+        cout << "timerlist.insert() error " << endl;
     }
 
     return earliestChanged;
@@ -148,12 +154,11 @@ void TimerQueue::resetTimerfd(int timerfd, Timestamp time)
     bzero(&newvalue, sizeof(newvalue));
     bzero(&oldvalue, sizeof(oldvalue));
     newvalue.it_value = howMuchTimeFromNow(time);
-    ret = timerfd_settime(timerfd, 0, &newvalue, &oldvalue);
+    int ret = timerfd_settime(timerfd, 0, &newvalue, &oldvalue);
     if  (ret)
     {
         std::cout<< "timerfd_settime error" << std::endl;
     }
-    return ret;
 }
 
 struct timespec TimerQueue::howMuchTimeFromNow(Timestamp when)

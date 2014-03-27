@@ -4,6 +4,7 @@
 #include "Declear.h"
 #include "IFChannelCallBack.h"
 #include "Timestamp.h"
+#include "IFRun.h"
 
 #include <vector>
 
@@ -35,10 +36,10 @@ public:
     void wakeup();
     void handlePendingRuns();
 
-    int runAt(Timestamp when, IRun* pRun);
-    int runAfter(double delay, IRun* pRun);
-    int runEvery(double interval, IRun* pRun);
-    void cancelTimer(int timerfd);
+    long runAt(Timestamp when, IFRun* pRun);
+    long runAfter(double delay, IFRun* pRun);
+    long runEvery(double interval, IFRun* pRun);
+    void cancelTimer(long timerId);
     
 private:
     Epoll *pPoller;

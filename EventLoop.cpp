@@ -15,7 +15,7 @@ using namespace std;
 EventLoop::EventLoop()
 :pPoller(new Epoll),
 pWakeupChannel(new Channel(this, ieventfd)),
-pTimerQueue(new TimerQueue())
+pTimerQueue(new TimerQueue(this))
 {
     ieventfd = createEventfd();
     //pWakeupChannel = new Channel(this, ieventfd);
@@ -102,19 +102,19 @@ void EventLoop::handlePendingRuns()
     }
 }
 
-int EventLoop::runAt(Timestamp when, IFRun* pRun)
+long EventLoop::runAt(Timestamp when, IFRun* pRun)
 {
     return pTimerQueue->addTimer( pRun, when, 0.0);
 }
-int EventLoop::runAfter(double delay, IRun* pRun)
+long EventLoop::runAfter(double delay, IFRun* pRun)
 {
     return pTimerQueue->addTimer(pRun, Timestamp::nowAfter(delay), 0.0);
 }
-int EventLoop::runEvery(double interval, IRun* pRun)
+long EventLoop::runEvery(double interval, IFRun* pRun)
 {
     return pTimerQueue->addTimer(pRun, Timestamp::nowAfter(interval), interval);
 }
-void EventLoop::cancelTimer(int timerId)
+void EventLoop::cancelTimer(long timerId)
 {
     pTimerQueue->cancelTimer(timerId);
 }

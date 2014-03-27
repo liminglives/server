@@ -4,6 +4,7 @@
 #include "Declear.h"
 #include "IFUser.h"
 #include "TcpServer.h"
+#include "IFRun.h"
 
 class EchoServer : public IFUser , public IFRun
 {
@@ -19,7 +20,7 @@ public:
 private:
     EventLoop *pLoop;
     TcpServer pServer;
-    int timer;
+    long timer;
     int times;
     
 };
