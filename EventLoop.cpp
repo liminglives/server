@@ -14,10 +14,11 @@ using namespace std;
 
 EventLoop::EventLoop()
 :pPoller(new Epoll),
+ieventfd(createEventfd()),
 pWakeupChannel(new Channel(this, ieventfd)),
 pTimerQueue(new TimerQueue(this))
 {
-    ieventfd = createEventfd();
+    //ieventfd = createEventfd();
     //pWakeupChannel = new Channel(this, ieventfd);
     pWakeupChannel->setCallBack(this);
     pWakeupChannel->enableReading();
@@ -27,6 +28,7 @@ EventLoop::~EventLoop()
 {
     delete pPoller;
     delete pWakeupChannel;
+    delete pTimerQueue;
     
 }
 
